@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Birthday Garden Party</title>
+<style>
+/* Layout: one centered column of soft white cards over a mint, lilac and peach wash. Photos are tilted polaroids. */
+:root{
+  --mint:#d9f2e6; --lilac:#e6dcf7; --peach:#ffe3d6; --plum:#4a2c5a; --rose:#e0709a; --rose-dark:#a94a72; --leaf:#2f7d5b; --white:#fff;
+  --serif:"DM Serif Display",Georgia,serif; --hand:"Caveat","Segoe Script",cursive; --sans:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{
+  background:linear-gradient(160deg,var(--mint) 0%,var(--lilac) 55%,var(--peach) 100%) fixed;
+  color:var(--plum); font-family:var(--sans); font-size:17px; line-height:1.55; margin:0;
+  padding-inline:16px; padding-block:28px 48px;
+}
+a{color:var(--leaf)} a:visited{color:var(--plum)}
+a:focus-visible,.btn:focus-visible,.name input:focus-visible,video:focus-visible,.ph button:focus-visible{outline:3px solid var(--rose); outline-offset:2px}
+.wrap{max-width:760px; margin-inline:auto; display:flex; flex-direction:column; gap:24px}
+.hero{text-align:center; display:flex; flex-direction:column; gap:10px; align-items:center; padding-block:8px}
+.sub{font-family:var(--hand); font-size:30px; color:var(--rose); line-height:1.1}
+h1{font-family:var(--serif); font-weight:400; margin:0; font-size:clamp(38px,11vw,84px); line-height:1; text-wrap:balance}
+h1 #who{color:var(--rose)}
+.full{font-family:var(--hand); font-size:28px; color:var(--leaf)}
+.row{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; align-items:center}
+.name{display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center; font-weight:700; font-size:15px}
+.name input{font:inherit; font-size:17px; width:min(14ch,60vw); background:var(--white); color:var(--plum); border:2px solid var(--plum); border-radius:10px; padding:4px 10px}
+.btn{font:inherit; font-weight:700; color:var(--white); background:var(--rose); border:0; border-radius:999px; padding:10px 22px; box-shadow:0 3px 0 var(--rose-dark); cursor:pointer}
+.btn:active{transform:translateY(2px); box-shadow:0 1px 0 var(--rose-dark)}
+.hr{height:14px; border:0; margin:0; background:radial-gradient(circle,var(--rose) 3px,transparent 4px) center/28px 14px repeat-x}
+.win{background:var(--white); border-radius:20px; box-shadow:0 10px 30px rgba(74,44,90,.15); padding:6px; min-width:0}
+.title{color:var(--leaf); font-family:var(--hand); font-size:28px; font-weight:600; padding:6px 12px 0; line-height:1.2}
+.body{padding:10px; display:flex; flex-direction:column; gap:10px; min-width:0}
+.msg{font-size:18px; margin:0}
+.msg b{color:var(--rose)}
+.reveal{display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center}
+.reveal p{margin:0; font-family:var(--hand); font-size:30px; color:var(--plum); line-height:1.15}
+.reveal .btn{font-size:18px}
+.photos{display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:18px; padding:6px}
+.ph{margin:0; min-width:0; background:var(--white); padding:8px 8px 14px; box-shadow:0 6px 16px rgba(74,44,90,.22); transform:rotate(-2deg); transition:transform .2s}
+.ph:nth-child(even){transform:rotate(2deg)}
+.ph:nth-child(3n){transform:rotate(-1deg)}
+.ph:hover{transform:rotate(0) scale(1.03)}
+.ph button{display:block; width:100%; padding:0; border:0; background:var(--lilac); cursor:zoom-in; aspect-ratio:1; overflow:hidden}
+.ph img{width:100%; height:100%; object-fit:cover; display:block}
+.ph figcaption{font-family:var(--hand); font-size:22px; text-align:center; margin-top:6px; line-height:1.1}
+.vids{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:20px; align-items:start}
+.vid{min-width:0}
+.vid.wide{grid-column:1/-1}
+video{display:block; width:100%; max-height:70vh; background:#000; border-radius:14px}
+.cap{font-family:var(--hand); font-size:24px; color:var(--leaf); margin:0; text-align:center; line-height:1.1}
+.qr{display:flex; gap:16px; align-items:center; flex-wrap:wrap; justify-content:center}
+.qr img{width:min(220px,60vw); height:auto; border:10px solid var(--white); border-radius:12px; box-shadow:0 6px 16px rgba(74,44,90,.2); background:var(--white)}
+.qr p{margin:0; max-width:28ch}
+footer{text-align:center; font-size:15px}
+canvas#fx{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:9}
+.lb{position:fixed; inset:0; z-index:20; background:rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; padding:16px; cursor:zoom-out}
+.lb img{max-width:100%; max-height:100%; object-fit:contain; border:8px solid var(--white); border-radius:6px}
+.count{position:fixed; inset:0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(74,44,90,.9); color:var(--white); text-align:center; padding:16px}
+.count small{font-family:var(--hand); font-size:34px}
+.count span{font-family:var(--serif); font-size:clamp(100px,40vw,260px); line-height:1; animation:pop .9s ease-out infinite}
+@keyframes pop{from{transform:scale(1.6); opacity:0}to{transform:scale(1); opacity:1}}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.count span{animation:none}.ph{transition:none}}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=DM+Serif+Display&family=Nunito:wght@400;700&display=swap">
+
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="lb" id="lb" hidden><img id="lbimg" alt=""></div>
+<div class="count" id="count" hidden role="status" aria-live="polite"><small>Get ready...</small><span id="cnum">3</span></div>
+<div class="wrap">
+  <header class="hero">
+    <div class="sub">a little something for your special day</div>
+    <h1>HAPPY BIRTHDAY<br><span id="who">SHARIE MAE</span>!</h1>
+    <div class="full">Sharie Mae Macion Rendon</div>
+    <div class="row"><button class="btn" id="boom" type="button">Confetti!!</button></div>
+    <label class="name" for="nm">Who's the birthday star?
+      <input id="nm" maxlength="18" placeholder="type a name" autocomplete="off">
+    </label>
+  </header>
+
+  <hr class="hr">
+
+  <section class="win" aria-labelledby="t0">
+    <div class="title" id="t0">A note for you</div>
+    <div class="body">
+      <p class="msg">Happy birthday, <b>Sharie Mae Macion Rendon</b> "<b>Doiii</b>"!</p>
+      <p class="msg">Padayon lang pag serve kay Lord, kaon, pulaw and lagaw. Pahuway anay stress subong adlaw haha. Godbless!</p>
+      <p class="msg" aria-hidden="true">🎁🎉🎁🎉❤️❤️❤️</p>
+    </div>
+  </section>
+
+  <section class="reveal" aria-labelledby="rv">
+    <p id="rv">Two surprises are waiting for you. Which one first?</p>
+    <div class="row">
+      <button class="btn" id="showPhotos" type="button">Reveal the photos</button>
+      <button class="btn" id="showVideos" type="button">Reveal the videos</button>
+    </div>
+  </section>
+
+  <section class="win" id="photoWin" hidden aria-labelledby="tp">
+    <div class="title" id="tp">Smile, it's your day</div>
+    <div class="body"><div class="photos" id="photos"></div></div>
+  </section>
+
+  <div class="vids" id="vidWrap" hidden>
+    <section class="win vid" aria-labelledby="c1">
+      <div class="title" id="c1">Memory one</div>
+      <div class="body"><video src="v1.mp4" poster="p1.jpg" controls playsinline preload="metadata"></video><p class="cap">Mar 22, 2026</p></div>
+    </section>
+    <section class="win vid" aria-labelledby="c2">
+      <div class="title" id="c2">Memory two</div>
+      <div class="body"><video src="v2.mp4" poster="p2.jpg" controls playsinline preload="metadata"></video><p class="cap">Apr 10, 2026</p></div>
+    </section>
+    <section class="win vid wide" aria-labelledby="c3">
+      <div class="title" id="c3">Memory three</div>
+      <div class="body"><video src="v3.mp4" poster="p3.jpg" controls playsinline preload="metadata"></video><p class="cap">May 19, 2026</p></div>
+    </section>
+  </div>
+
+  <hr class="hr">
+
+  <section class="win" aria-labelledby="tq">
+    <div class="title" id="tq">Share this page</div>
+    <div class="body qr">
+      <img src="qr.png" alt="QR code that opens this birthday page" width="220" height="220">
+      <p>Scan this code with your phone camera to open the page and share the birthday love.</p>
+    </div>
+  </section>
+
+  <footer>Last updated Oct 10 · <a href="#top" id="top">Back to top</a></footer>
+</div>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+
+  /* name */
+  var who=$("#who"), nm=$("#nm");
+  nm.value="Sharie Mae";
+  nm.addEventListener("input",function(){var v=nm.value.trim(); who.textContent=v?v.toUpperCase():"SHARIE MAE"});
+
+  /* photos */
+  var alts=["Smiling in front of a green chalkboard in a Teachers for Jesus frame","Smiling in a mint green sleeveless top with a blurred garden behind","Resting her chin on her hands in a green dress at a farm-themed cafe","Smiling with a hand under her chin, bookshelf and diploma behind","Smiling selfie with long wavy hair and a hand raised","Selfie in a yellow top, resting her chin on her hands","Standing on a road in a purple dress, glancing to the side","Wearing a Faculty sash and a barong-style top on stage","Smiling in a DepEd Negros Island Region frame"];
+  var ph=$("#photos");
+  alts.forEach(function(a,i){
+    var n=i+1, f=document.createElement("figure"); f.className="ph";
+    var b=document.createElement("button"); b.type="button"; b.setAttribute("aria-label","Open photo "+n);
+    var im=document.createElement("img"); im.src="ph"+n+".jpg"; im.alt=a; im.loading="lazy";
+    b.appendChild(im);
+    var c=document.createElement("figcaption"); c.textContent="Photo "+n;
+    f.appendChild(b); f.appendChild(c); ph.appendChild(f);
+    b.addEventListener("click",function(){$("#lbimg").src=im.src;$("#lbimg").alt=a;$("#lb").hidden=false});
+  });
+  $("#lb").addEventListener("click",function(){this.hidden=true});
+  addEventListener("keydown",function(e){if(e.key==="Escape")$("#lb").hidden=true});
+
+  /* confetti */
+  var cv=$("#fx"), ctx=cv.getContext("2d"), P=[], raf=0;
+  function size(){cv.width=innerWidth; cv.height=innerHeight}
+  size(); addEventListener("resize",size);
+  var cols=["#e0709a","#9fd8bd","#b9a3e8","#ffc2a1","#ffe08a","#ffffff"];
+  function burst(){
+    for(var i=0;i<160;i++){
+      P.push({x:Math.random()*cv.width,y:-10-Math.random()*cv.height*0.4,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,
+        w:6+Math.random()*6,h:6+Math.random()*6,c:cols[i%cols.length],life:300});
+    }
+    if(!raf) loop();
+  }
+  function loop(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    P=P.filter(function(p){return p.life>0&&p.y<cv.height+20});
+    P.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.life--;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.w,p.h)});
+    raf=P.length?requestAnimationFrame(loop):0;
+    if(!raf) ctx.clearRect(0,0,cv.width,cv.height);
+  }
+
+  /* soft chime, starts only after a click */
+  var ac;
+  function beep(notes){
+    try{
+      ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+      var t=ac.currentTime;
+      notes.forEach(function(f,i){
+        var o=ac.createOscillator(),g=ac.createGain();
+        o.type="sine";o.frequency.value=f;g.gain.value=.06;
+        o.connect(g);g.connect(ac.destination);
+        o.start(t+i*.14);g.gain.setValueAtTime(.06,t+i*.14+.11);g.gain.linearRampToValueAtTime(0,t+i*.14+.13);o.stop(t+i*.14+.14);
+      });
+    }catch(e){}
+  }
+  $("#boom").addEventListener("click",function(){burst();beep([262,262,294,262,349,330])});
+
+  /* suspense reveal: 3-2-1, then show the section */
+  var busy=false;
+  function reveal(btn,target,doneText){
+    if(!target.hidden){target.scrollIntoView({behavior:"smooth",block:"start"});return}
+    if(busy) return; busy=true;
+    var box=$("#count"), num=$("#cnum"), n=3;
+    num.textContent=n; box.hidden=false; beep([392]);
+    var t=setInterval(function(){
+      n--;
+      if(n>0){num.textContent=n; beep([392+(3-n)*80]);return}
+      clearInterval(t); box.hidden=true; busy=false;
+      target.hidden=false; btn.textContent=doneText;
+      burst(); beep([523,659,784,1047]);
+      target.scrollIntoView({behavior:"smooth",block:"start"});
+    },900);
+  }
+  $("#showPhotos").addEventListener("click",function(){reveal(this,$("#photoWin"),"Back to the photos")});
+  $("#showVideos").addEventListener("click",function(){reveal(this,$("#vidWrap"),"Back to the videos")});
+
+  setTimeout(burst,600);
+})();
+</script>
+
+</body>
+</html>
